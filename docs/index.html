@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>outlook-mcp</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-dim: #8b949e;
+            --accent: #58a6ff;
+            --accent-hover: #79c0ff;
+            --green: #3fb950;
+            --orange: #d29922;
+            --purple: #bc8cff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            border-bottom: 1px solid var(--border);
+            padding: 40px 20px 32px;
+        }
+        .header-inner {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .header h1 code {
+            font-weight: 600;
+            font-size: 1.75rem;
+            color: var(--text);
+        }
+        .header .tagline {
+            color: var(--text-dim);
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+        .header-meta {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .header-meta a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .header-meta a:hover { text-decoration: underline; }
+        .header-meta .sep { color: var(--border); }
+        .pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+        section { padding: 40px 0; border-bottom: 1px solid var(--border); }
+        section:last-child { border-bottom: none; }
+        h2 { font-size: 1.35rem; font-weight: 600; margin-bottom: 16px; }
+        h3 { font-size: 1.05rem; margin: 20px 0 8px; }
+
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin: 8px 0;
+        }
+        code {
+            font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+            font-size: 0.875rem;
+        }
+        .ci {
+            background: var(--surface);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+        .g { color: var(--green); }
+
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { text-align: left; padding: 8px 12px; border: 1px solid var(--border); font-size: 0.875rem; }
+        th { background: var(--surface); font-weight: 600; }
+        td code { color: var(--accent); }
+        .tag-r { background: #1a3a2a; color: var(--green); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+        .tag-w { background: #3d2e0a; color: var(--orange); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 12px 0; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+        .card h4 { font-size: 0.9rem; margin-bottom: 6px; color: var(--accent); }
+        .card p { font-size: 0.85rem; color: var(--text-dim); }
+
+        .cql { display: flex; flex-direction: column; gap: 6px; }
+        .cql-row { display: flex; gap: 12px; align-items: baseline; }
+        .cql-label { flex-shrink: 0; width: 180px; color: var(--text-dim); font-size: 0.85rem; }
+        .cql-code { font-family: 'Cascadia Code', monospace; font-size: 0.85rem; color: var(--green); }
+
+        .term {
+            background: #0a0e14;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            font-family: 'Cascadia Code', monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+        }
+        .term .s { color: var(--orange); }
+        .term .ok { color: var(--green); }
+        .term .d { color: var(--text-dim); }
+        .term .h { color: var(--accent); }
+
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 8px 20px; text-align: center; font-size: 0.78rem; color: var(--text-dim); }
+        .topbar a { color: var(--accent); }
+        footer { text-align: center; padding: 32px 20px; color: var(--text-dim); font-size: 0.8rem; }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.4rem; }
+            .cql-row { flex-direction: column; gap: 2px; }
+            .cql-label { width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">Maintained by the GRC &amp; Legal IT team &mdash; issues or questions? Reach out on <a href="https://github.deutsche-boerse.de/at384/outlook-mcp/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a></div>
+
+<div class="header">
+    <div class="header-inner">
+        <h1><code>outlook-mcp</code></h1>
+        <p class="tagline">Blazing-fast MCP server for Microsoft Outlook via Graph API. 8 tools &mdash; search, read, send, reply &mdash; all from VS Code chat. Built in Go for instant startup.</p>
+        <div class="header-meta">
+            <a href="https://github.deutsche-boerse.de/at384/outlook-mcp" target="_blank" rel="noopener noreferrer">GitHub &nearr;</a>
+            <span class="sep">|</span>
+            <a href="https://developer.microsoft.com/en-us/graph/graph-explorer" target="_blank" rel="noopener noreferrer">Graph Explorer &nearr;</a>
+            <span class="sep">|</span>
+            <span class="pill">Go 1.23+</span>
+            <span class="pill">MCP v1.4</span>
+            <span class="pill">~30ms cold start</span>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+<section>
+    <h2>Quick Start</h2>
+
+    <h3>1. Get a Microsoft Graph Token</h3>
+    <p style="color:var(--text-dim); margin-bottom:8px;">Go to <a href="https://developer.microsoft.com/en-us/graph/graph-explorer" target="_blank">Graph Explorer</a>, sign in with your corporate account, and copy the access token. Required scopes: <code class="ci">Mail.ReadWrite</code>, <code class="ci">Mail.Send</code>.</p>
+
+    <h3>2. Clone &amp; build</h3>
+    <pre><span class="g">$</span> git clone https://github.deutsche-boerse.de/at384/outlook-mcp.git
+<span class="g">$</span> cd outlook-mcp
+<span class="g">$</span> go build -o outlook-mcp.exe .</pre>
+    <p style="color:var(--text-dim);margin-top:8px;font-size:0.85rem;">If you have SSH configured: <code class="ci">git clone git@github.deutsche-boerse.de:at384/outlook-mcp.git</code></p>
+
+    <div class="term">
+        <span class="d"># Single binary, zero runtime dependencies</span><br>
+        <span class="ok">outlook-mcp.exe</span> &mdash; <span class="s">11.4 MB</span> &mdash; ready
+    </div>
+
+    <h3>3. Add to VS Code</h3>
+    <p style="color:var(--text-dim); margin-bottom:8px;">Add to <code class="ci">%APPDATA%\Code\User\mcp.json</code>:</p>
+    <pre>{
+  "servers": {
+    "outlook": {
+      "command": "C:/path/to/outlook-mcp.exe",
+      "env": { "OUTLOOK_TOKEN": "your-graph-token" },
+      "type": "stdio"
+    }
+  }
+}</pre>
+
+    <h3>4. Reload VS Code</h3>
+    <p style="color:var(--text-dim);"><code class="ci">Ctrl+Shift+P</code> &rarr; Developer: Reload Window. The <code class="ci">outlook</code> server appears in your MCP list. Done.</p>
+</section>
+
+<section>
+    <h2>Why Use This</h2>
+    <div class="cards">
+        <div class="card">
+            <h4>Lightning-fast search</h4>
+            <p>KQL-powered full-text search across your entire mailbox. Find any email in milliseconds using from:, subject:, date ranges, and boolean operators.</p>
+        </div>
+        <div class="card">
+            <h4>Send &amp; reply from chat</h4>
+            <p>Draft and send emails, reply to threads, CC/BCC &mdash; all without leaving VS Code. Copilot picks the right tool automatically.</p>
+        </div>
+        <div class="card">
+            <h4>Zero startup overhead</h4>
+            <p>Single Go binary. ~30ms cold start vs ~2s for Python servers. HTTP/2 connection pooling to Graph API keeps subsequent calls instant.</p>
+        </div>
+        <div class="card">
+            <h4>Powerful filtering</h4>
+            <p>OData $filter for structured queries (unread, importance, date ranges), KQL $search for free-text. Pagination, custom field selection, folder scoping.</p>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Tools (8)</h2>
+
+    <h3>Read (4)</h3>
+    <table>
+        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+        <tr><td><code>list_emails</code> <span class="tag-r">READ</span></td><td>List emails with filter/search/sort</td><td><code>list_emails(filter:"isRead eq false")</code></td></tr>
+        <tr><td><code>read_email</code> <span class="tag-r">READ</span></td><td>Read full email by ID</td><td><code>read_email(id:"AAMk...")</code></td></tr>
+        <tr><td><code>search_emails</code> <span class="tag-r">READ</span></td><td>KQL search across mailbox</td><td><code>search_emails(query:"from:john subject:budget")</code></td></tr>
+        <tr><td><code>list_folders</code> <span class="tag-r">READ</span></td><td>List all mail folders</td><td><code>list_folders(include_children:true)</code></td></tr>
+    </table>
+
+    <h3>Write (3)</h3>
+    <table>
+        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+        <tr><td><code>send_email</code> <span class="tag-w">WRITE</span></td><td>Send email with To/CC/BCC</td><td><code>send_email(to:"a@b.com", subject:"Hi")</code></td></tr>
+        <tr><td><code>reply_email</code> <span class="tag-w">WRITE</span></td><td>Reply or reply-all</td><td><code>reply_email(id:"AAMk...", comment:"Done")</code></td></tr>
+        <tr><td><code>move_email</code> <span class="tag-w">WRITE</span></td><td>Move to folder</td><td><code>move_email(id:"AAMk...", folder_id:"Archive")</code></td></tr>
+    </table>
+
+    <h3>Info (1)</h3>
+    <table>
+        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+        <tr><td><code>list_attachments</code> <span class="tag-r">READ</span></td><td>List attachments on email</td><td><code>list_attachments(id:"AAMk...")</code></td></tr>
+    </table>
+</section>
+
+<section>
+    <h2>Usage</h2>
+    <p style="color:var(--text-dim); margin-bottom:16px;">Talk to Copilot in VS Code chat. It picks the right tool.</p>
+    <div class="cards">
+        <div class="card"><h4>Search</h4><p>"Search my emails about the security audit"</p></div>
+        <div class="card"><h4>Filter</h4><p>"Show my unread high-importance emails"</p></div>
+        <div class="card"><h4>Read</h4><p>"Read the latest email from Ramesh"</p></div>
+        <div class="card"><h4>Send</h4><p>"Send an email to the team about tomorrow's standup"</p></div>
+        <div class="card"><h4>Reply</h4><p>"Reply to that email saying I'll handle it"</p></div>
+        <div class="card"><h4>Organize</h4><p>"Move that email to Archive"</p></div>
+    </div>
+</section>
+
+<section>
+    <h2>KQL Search Reference</h2>
+    <p style="color:var(--text-dim); margin-bottom:12px;"><code class="ci">search_emails</code> uses Microsoft's Keyword Query Language.</p>
+    <div class="cql">
+        <div class="cql-row"><span class="cql-label">Plain text</span><span class="cql-code">security audit</span></div>
+        <div class="cql-row"><span class="cql-label">By sender</span><span class="cql-code">from:john@example.com</span></div>
+        <div class="cql-row"><span class="cql-label">By recipient</span><span class="cql-code">to:team@example.com</span></div>
+        <div class="cql-row"><span class="cql-label">By subject</span><span class="cql-code">subject:quarterly report</span></div>
+        <div class="cql-row"><span class="cql-label">With attachments</span><span class="cql-code">hasAttachments:true</span></div>
+        <div class="cql-row"><span class="cql-label">Date range</span><span class="cql-code">received&gt;=2026-01-01</span></div>
+        <div class="cql-row"><span class="cql-label">Importance</span><span class="cql-code">importance:high</span></div>
+        <div class="cql-row"><span class="cql-label">Boolean</span><span class="cql-code">from:john AND subject:budget</span></div>
+        <div class="cql-row"><span class="cql-label">Negation</span><span class="cql-code">NOT from:noreply@</span></div>
+        <div class="cql-row"><span class="cql-label">Grouping</span><span class="cql-code">(subject:report OR subject:update) AND from:manager</span></div>
+    </div>
+</section>
+
+<section>
+    <h2>OData Filter Reference</h2>
+    <p style="color:var(--text-dim); margin-bottom:12px;"><code class="ci">list_emails</code> supports <code class="ci">$filter</code> for structured queries.</p>
+    <div class="cql">
+        <div class="cql-row"><span class="cql-label">Unread only</span><span class="cql-code">isRead eq false</span></div>
+        <div class="cql-row"><span class="cql-label">High importance</span><span class="cql-code">importance eq 'high'</span></div>
+        <div class="cql-row"><span class="cql-label">Has attachments</span><span class="cql-code">hasAttachments eq true</span></div>
+        <div class="cql-row"><span class="cql-label">From sender</span><span class="cql-code">from/emailAddress/address eq 'john@example.com'</span></div>
+        <div class="cql-row"><span class="cql-label">After date</span><span class="cql-code">receivedDateTime ge 2026-05-01T00:00:00Z</span></div>
+        <div class="cql-row"><span class="cql-label">Date range</span><span class="cql-code">receivedDateTime ge 2026-05-01 and receivedDateTime lt 2026-05-18</span></div>
+        <div class="cql-row"><span class="cql-label">Subject contains</span><span class="cql-code">contains(subject,'report')</span></div>
+    </div>
+</section>
+
+<section>
+    <h2>Architecture</h2>
+    <pre>
+ ┌─────────────┐    stdio/JSON-RPC    ┌─────────────────┐   HTTPS + Bearer   ┌────────────────┐
+ │  VS Code    │ ◄──────────────────► │  outlook-mcp    │ ◄───────────────► │  Microsoft     │
+ │  Copilot    │                      │  (Go binary)    │   HTTP/2 pooled    │  Graph API     │
+ └─────────────┘                      └─────────────────┘                    └────────────────┘</pre>
+    <h3>Transport</h3>
+    <p style="color:var(--text-dim);">stdio &mdash; VS Code spawns the Go binary, communicates via JSON-RPC over stdin/stdout. Zero network hop.</p>
+    <h3>Auth</h3>
+    <p style="color:var(--text-dim);">Bearer token (delegated) via <code class="ci">OUTLOOK_TOKEN</code> env var. Get from Graph Explorer or MSAL.</p>
+    <h3>Stack</h3>
+    <p style="color:var(--text-dim);">Go 1.23 + <code class="ci">github.com/modelcontextprotocol/go-sdk</code> (MCP v1.4) + <code class="ci">net/http</code> with HTTP/2 connection pooling.</p>
+</section>
+
+<section>
+    <h2>Troubleshooting</h2>
+    <h3>Server not showing?</h3>
+    <p style="color:var(--text-dim);"><code class="ci">Ctrl+Shift+P</code> &rarr; MCP: Reset All Cached MCP Servers, then reload.</p>
+    <h3>401 Unauthorized?</h3>
+    <p style="color:var(--text-dim);">Ensure your token has <code class="ci">Mail.ReadWrite</code> and <code class="ci">Mail.Send</code> scopes.</p>
+    <h3>$search errors?</h3>
+    <p style="color:var(--text-dim);">KQL search cannot combine with <code class="ci">$orderby</code>. Use <code class="ci">$filter</code> + <code class="ci">orderby</code> for sorted results, or <code class="ci">$search</code> alone for relevance-ranked results.</p>
+</section>
+
+</div>
+
+<footer>
+    Developed &amp; maintained by the GRC &amp; Legal IT team &mdash;
+    <a href="https://github.deutsche-boerse.de/at384/outlook-mcp">GitHub</a> &middot;
+    <a href="https://developer.microsoft.com/en-us/graph/graph-explorer">Graph Explorer</a>
+</footer>
+
+</body>
+</html>
