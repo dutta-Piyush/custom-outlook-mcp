@@ -1,0 +1,18 @@
+# Python
+.venv/
+__pycache__/
+docs/__pycache__/
+*/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+
+# VS Code
+.vscode/mcp.json
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
